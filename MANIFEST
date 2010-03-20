@@ -1,0 +1,15 @@
+Changes
+lib/DBIx/Class/I18NColumns.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/04-basic.t
+t/lib/I18NTest.pm
+t/lib/I18NTest/Schema.pm
+t/lib/I18NTest/Schema/Result/Item.pm
+t/lib/I18NTest/Schema/Result/ItemI18N.pm
+t/pod-coverage.t
+t/pod.t
