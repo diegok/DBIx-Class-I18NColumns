@@ -1,5 +1,5 @@
 ---
-abstract: "Internationalization for DBIx::Class ResultSet'ss"
+abstract: 'Internationalization for DBIx::Class Result class'
 author:
   - 'Diego Kuperman, C<< <diego at freekeylabs.com > >>'
 build_requires:

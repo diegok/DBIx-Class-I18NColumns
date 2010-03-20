@@ -14,7 +14,7 @@ sub add_i18n_columns {
     my @columns = @_;
 
     $self->_i18n_columns( {} ) unless defined $self->_i18n_columns();
-#    $self->_i18n_column_data( {} ) unless defined $self->_i18n_column_data();
+    $self->resultset_class( 'DBIx::Class::ResultSet::I18NColumns' );
 
     # Add columns & accessors
     while ( my $column = shift @columns ) {
@@ -175,6 +175,10 @@ sub update {
 
     return $self;
 }
+
+#TODO: delete
+#TODO: get_columns
+#TODO: get_dirty_columns
 
 =head1 NAME
 

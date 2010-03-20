@@ -29,4 +29,25 @@ our $item_id;
     is ( $item->name, 'Diego Maradona', 'Column name is ok (normal column)');
     is ( $item->string(['en']), 'test in english', 'English string is ok (i18n column)');
     is ( $item->string(['es']), 'test en español', 'Spanish string is ok (i18n column)');
+
+    ok ( $item->language('en'), 'Set english language' );
+    is ( $item->string, 'test in english', 'Retrieve string with lang set' );
+    ok ( $item->string('Test in English'), 'Set string with lang set' );
+    is ( $item->string, 'Test in English', 'Retrieve string with lang set' );
+    ok ( $item->update, "Call update" );
+}
+
+{ # find item using lang
+    ok ( my $item = $schema->resultset('Item')->find({ id => $item_id, language => 'en' }), 'Retrieve the item with language' );
+    is ( $item->string, 'Test in English', 'Retrieve string with lang set' );
+    ok ( $item->string('test in english'), 'Set string with lang set' );
+    is ( $item->string, 'test in english', 'Retrieve string with lang set' );
+    ok ( $item->update, "Call update" );
+}
+
+{ # find item using lang
+    ok ( my $rs = $schema->resultset('Item')->search({ language => 'en' }), 'Search items with language' );
+    is ( $rs->language, 'en', 'ResultSet has language set');
+    ok ( my $item = $rs->next, 'Getting next item from rs');
+    is ( $item->language, 'en', 'Row has language set');
 }
