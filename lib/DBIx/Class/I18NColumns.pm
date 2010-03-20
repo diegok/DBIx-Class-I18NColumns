@@ -61,7 +61,7 @@ sub _i18n_attr {
     if (my $i18n_row = $self->i18n_resultset->find(
             {   attr                   => $attr,
                 $self->language_column => $language,
-                id_item                => $self->id,
+                $fk_column             => $self->id,
             }
         )
         )
