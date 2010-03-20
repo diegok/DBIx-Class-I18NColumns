@@ -7,13 +7,14 @@ use base qw/DBIx::Class/;
 our $VERSION = '0.01';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
-__PACKAGE__->mk_group_accessors( 'simple' => qw/ language / );
+__PACKAGE__->mk_group_accessors( 'simple' => qw/ language _i18n_column_data / );
 
 sub add_i18n_columns {
     my $self    = shift;
     my @columns = @_;
 
     $self->_i18n_columns( {} ) unless defined $self->_i18n_columns();
+#    $self->_i18n_column_data( {} ) unless defined $self->_i18n_column_data();
 
     # Add columns & accessors
     while ( my $column = shift @columns ) {
@@ -32,45 +33,34 @@ sub add_i18n_columns {
         no strict 'refs';
         *{ $self . '::' . $accessor } = sub {
             my $self = shift;
-            $self->_i18n_attr( $column => @_ );
+            $self->_i18n_method( $column => @_ );
         };
     }
 }
 
-sub _i18n_attr {
-    my ( $self, $attr ) = ( shift, shift );
+sub _i18n_method {
+    my ( $self, $column ) = ( shift, shift );
     
-    my $language = ref $_[-1] ? pop->[0] : $self->language; 
+    my $old_language = $self->language;
+    $self->language(pop->[0]) if scalar @_ && ref $_[-1]; 
+
     $self->throw_exception( "Cannot get or set an i18n column with no language defined" )
-        unless $language;
+        unless $self->language;
 
-    my $type_of_attr = $self->_i18n_columns->{$attr}{data_type};
-
-    my $fk_column = 'id_' . $self->result_source->name;
-
+    my $ret;
     if ( my $value = shift ) {
-        return $self->i18n_resultset->update_or_create(
-            {   attr                   => $attr,
-                $self->language_column => $language,
-                $fk_column             => $self->id,
-                $type_of_attr          => $value,
-            }
-        );
+        $ret = $self->set_column( $column => $value );
+    }
+    else {
+        $ret = $self->get_column( $column );
     }
 
-    if (my $i18n_row = $self->i18n_resultset->find(
-            {   attr                   => $attr,
-                $self->language_column => $language,
-                $fk_column             => $self->id,
-            }
-        )
-        )
-    {
-        return $i18n_row->$type_of_attr;
-    }
+    $self->language($old_language);
 
-    return undef;
+    return $ret; 
 }
+
+sub foreign_column { 'id_' . shift->result_source->name }
 
 sub i18n_resultset {
     my $self = shift;
@@ -83,9 +73,112 @@ sub i18n_resultset {
 
 sub language_column { 'language' }
 
+=head2 has_any_column
+
+Returns true if the source has a i18n or regular column of this name, 
+false otherwise.
+
+=cut
+
+sub has_any_column {
+    my ( $self, $column ) = ( shift, shift );
+    return ( $self->has_i18n_column($column) || $self->has_column($column) )
+        ? 1
+        : 0;
+}
+
+=head2 has_i18n_column
+
+Returns true if the source has a i18n column of this name, false otherwise.
+
+=cut
+
+sub has_i18n_column {
+    my ( $self, $column ) = ( shift, shift );
+    return ( exists $self->_i18n_columns->{$column} ) ? 1 : 0;
+}
+
+sub set_column {
+    my ( $self, $column, $value ) = @_;
+
+    if ( $self->has_i18n_column($column) ) {
+        #TODO: do I need to make it dirty?
+        return $self->store_column( $column => $value );
+    }
+
+    return $self->next::method( $column, $value );
+}
+
+sub store_column {
+    my ( $self, $column, $value ) = @_;
+
+    $self->_i18n_column_data({}) unless $self->_i18n_column_data;
+    $self->_i18n_column_data->{$column} = {} unless exists $self->_i18n_column_data->{$column};
+
+    if ( $self->has_i18n_column($column) ) {
+        my $type = $self->_i18n_columns->{$column}{data_type};
+        if ( exists $self->_i18n_column_data->{$column}{ $self->language} ) {
+            return $self->_i18n_column_data->{$column}{ $self->language }
+                ->$type($value);
+        }
+        else {
+            return $self->_i18n_column_data->{$column}{ $self->language }
+                = $self->i18n_resultset->new({   
+                    $type                  => $value,
+                    $self->language_column => $self->language,
+                    $self->foreign_column  => $self->id,
+                    attr                   => $column,
+                });
+        }
+    }
+
+    return $self->next::method( $column, $value );
+}
+
+sub get_column {
+    my ( $self, $column ) = ( shift, shift );
+    my $lang = $self->language;
+
+    $self->_i18n_column_data({}) unless $self->_i18n_column_data;
+    $self->_i18n_column_data->{$column} = {} unless exists $self->_i18n_column_data->{$column};
+
+    if ( $self->has_i18n_column($column) ) {
+        unless ( exists $self->_i18n_column_data->{$column}{$lang} ) {
+            $self->_i18n_column_data->{$column}{$lang} = 
+                $self->i18n_resultset->find_or_new({   
+                    attr                   => $column,
+                    $self->language_column => $self->language,
+                    $self->foreign_column  => $self->id,
+            });
+        }
+
+        my $type = $self->_i18n_columns->{$column}{data_type};
+        return $self->_i18n_column_data->{$column}{$lang}->$type;
+    }
+
+    return $self->next::method( $column, @_ );
+}
+
+sub update {
+    my $self = shift;
+
+    $self->next::method( @_ );
+
+    if ( $self->_i18n_column_data ) {
+        for my $column ( keys %{$self->_i18n_column_data} ) {
+            for my $lang ( keys %{$self->_i18n_column_data->{$column}} ) {
+                my $i18n_row = $self->_i18n_column_data->{$column}{$lang};
+                $i18n_row->in_storage ? $i18n_row->update : $i18n_row->insert ;
+            }
+        }
+    }
+
+    return $self;
+}
+
 =head1 NAME
 
-DBIx::Class::I18NColumns - Internationalization for DBIx::Class ResultSet'ss
+DBIx::Class::I18NColumns - Internationalization for DBIx::Class Result class
 
 =head1 VERSION
 
