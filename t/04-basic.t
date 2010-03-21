@@ -45,9 +45,23 @@ our $item_id;
     ok ( $item->update, "Call update" );
 }
 
-{ # find item using lang
+{ # search with lang
     ok ( my $rs = $schema->resultset('Item')->search({ language => 'en' }), 'Search items with language' );
     is ( $rs->language, 'en', 'ResultSet has language set');
     ok ( my $item = $rs->next, 'Getting next item from rs');
     is ( $item->language, 'en', 'Row has language set');
 }
+
+{ # create item with lang
+    ok ( my $item = $schema->resultset('Item')->create({
+            name   => 'Carlos Gardel',
+            string => 'De chiquitin te miraba de afuera...',
+            text   => '...como esas cosas que nunca se alcanzan...',
+            language => 'es',
+        }), 'Create an item with language' 
+    );
+    is ( $item->language, 'es', 'Row has language spanish');
+    like ( $item->string, qr/chiquitin/, 'string is retrieved correctly');
+    like ( $item->text, qr/cosas/, 'text is retrieved correctly');
+}
+

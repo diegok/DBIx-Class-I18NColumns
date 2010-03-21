@@ -6,6 +6,36 @@ use base qw/ DBIx::Class::ResultSet /;
 
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language / );
 
+sub create {
+    my $self = shift;
+
+    my @args = $self->_extract_lang(@_);
+
+    # extract i18n columns
+    my $i18n_attr = {};
+    if ( ref $args[0] eq 'HASH' ) {
+        for my $attr ( keys %{$args[0]} ) {
+            if ( $self->result_class->has_i18n_column($attr) ) {
+                $i18n_attr->{$attr} = delete $args[0]->{$attr};
+            }
+        }
+    }
+
+    my $row = $self->next::method( @args );
+
+    if ( $row && $self->language ) {
+        $row->language( $self->language );
+    }
+
+    # store i18n extracted columns
+    for my $attr ( keys %{$i18n_attr} ) {
+        $row->set_column( $attr, $i18n_attr->{$attr} );
+    }
+    $row->update;
+
+    return $row;
+}
+
 sub find {
     my $self = shift;
     my $row = $self->next::method( $self->_extract_lang(@_) );
