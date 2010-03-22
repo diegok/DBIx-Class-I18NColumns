@@ -3,6 +3,8 @@ package DBIx::Class::I18NColumns;
 use warnings;
 use strict;
 use base qw/DBIx::Class/;
+use Scalar::Util qw(blessed);
+use Class::C3::Componentised;
 
 our $VERSION = '0.01';
 
@@ -38,6 +40,38 @@ sub add_i18n_columns {
     }
 }
 
+sub _create_i18n_result_source {
+    my $self = shift;
+
+    $self->_create_i18n_result_source;
+    print STDERR $_ for $self->result_source->schema->sources;
+    my $class = ( blessed($self) || $self ) . 'Test';
+    print STDERR $class, "\n";
+    Class::C3::Componentised->inject_base($class, 'DBIx::Class');
+
+    $class->load_components( qw/ ForceUTF8 Core / );
+
+    $class->table( 'on_the_fly' );
+    $class->add_columns(
+        'id_item',
+        { data_type => 'INT', default_value => 0, is_nullable => 0 },
+        'language',
+        { data_type => 'VARCHAR', default_value => '', is_nullable => 0, size => 2 },
+        'attr',
+        { data_type => 'VARCHAR', is_nullable => 0, size => 32 },
+        'varchar',
+        { data_type => 'VARCHAR', is_nullable => 1, size => 255 },
+        'text',
+        { data_type => 'TEXT', is_nullable => 1 },
+    );
+
+    $class->set_primary_key("id_item", "language", "attr");
+
+    #$self->result_source->schema->register_class( ( blessed($self) || $self ) . 'Test' => $class );
+    #$self->result_source->schema->register_source( ( blessed($self) || $self ) . 'Test' => $class );
+
+}
+
 sub _i18n_method {
     my ( $self, $column ) = ( shift, shift );
     
@@ -65,7 +99,8 @@ sub foreign_column { 'id_' . shift->result_source->name }
 sub i18n_resultset {
     my $self = shift;
 
-    my $i18n_rs_class = ( ref $self ) . 'I18N';
+    my $i18n_rs_class = blessed( $self ) . 'I18N';
+    print STDERR $i18n_rs_class, "\n";
     my ($i18n_rs_name) = $i18n_rs_class =~ /([^:]+)$/;
 
     return $self->result_source->schema->resultset( $i18n_rs_name );
