@@ -6,7 +6,8 @@ use warnings;
 use DBICx::TestDatabase;
 
 sub new {
-    return DBICx::TestDatabase->new( 'I18NTest::Schema' );
+    my ( $class, $schema_class ) = @_;
+    return DBICx::TestDatabase->new( $schema_class || 'I18NTest::Schema' );
 }
 
 1;
