@@ -23,4 +23,6 @@ __PACKAGE__->add_i18n_columns(
 
 __PACKAGE__->set_primary_key( 'id' );
 
+sub auto_i18n_rs { 0 }
+
 1;

@@ -24,4 +24,6 @@ __PACKAGE__->add_columns(
 __PACKAGE__->set_primary_key("id_item", "language", "attr");
 __PACKAGE__->belongs_to("id_item", "I18NTest::Schema::Result::Item", { id => "id_item" });
 
+sub testme { 'yay!' }
+
 1;

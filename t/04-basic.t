@@ -65,3 +65,7 @@ our $item_id;
     like ( $item->text, qr/cosas/, 'text is retrieved correctly');
 }
 
+{
+    ok ( my $rs = $schema->resultset('ItemI18N')->search(), 'Search i18n rs' );
+    is ( $rs->next->testme, 'yay!', 'Row object has extended method');
+}

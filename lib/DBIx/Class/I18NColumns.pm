@@ -17,7 +17,7 @@ sub add_i18n_columns {
 
     $self->_i18n_columns( {} ) unless defined $self->_i18n_columns();
     $self->resultset_class( 'DBIx::Class::ResultSet::I18NColumns' );
-    $self->_create_i18n_result_source;
+    $self->_create_i18n_result_source if $self->auto_i18n_rs;
 
     # Add columns & accessors
     while ( my $column = shift @columns ) {
@@ -40,6 +40,8 @@ sub add_i18n_columns {
         };
     }
 }
+
+sub auto_i18n_rs { 1 }
 
 sub _create_i18n_result_source {
     my $self = shift;
