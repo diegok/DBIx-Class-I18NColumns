@@ -1,5 +1,3 @@
-#!perl
-
 use inc::Module::Install;
 
 name 'DBIx-Class-I18NColumns';

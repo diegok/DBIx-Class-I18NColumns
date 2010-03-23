@@ -1,7 +1,6 @@
 DBIx-Class-I18NColumns
 
-This module is an experiment for a dbic component to give internationalizable
-pseudo-column accessors to resultsets.
+This is a DBIC component to give internationalizable pseudo-column accessors to resultsets.
 
 INSTALLATION
 
