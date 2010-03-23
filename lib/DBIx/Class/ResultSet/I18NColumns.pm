@@ -6,6 +6,17 @@ use base qw/ DBIx::Class::ResultSet /;
 
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language / );
 
+=head1 NAME
+
+DBIx::Class::ResultSet::I18NColumns - Internationalization for DBIx::Class ResultSet class
+
+=head1 DESCRIPTION
+
+See L<DBIx::Class::I18NColumns>
+
+=head2 create
+=cut
+
 sub create {
     my $self = shift;
 
@@ -36,6 +47,9 @@ sub create {
     return $row;
 }
 
+=head2 find
+=cut
+
 sub find {
     my $self = shift;
     my $row = $self->next::method( $self->_extract_lang(@_) );
@@ -44,6 +58,9 @@ sub find {
     }
     return $row;
 }
+
+=head2 search
+=cut
 
 sub search {
     my $self = shift;
@@ -54,6 +71,9 @@ sub search {
     return $rs;
 }
 
+=head2 single
+=cut
+
 sub single {
     my $self = shift;
     my $row = $self->next::method( $self->_extract_lang(@_) );
@@ -63,6 +83,9 @@ sub single {
     return $row;
 }
 
+=head2 next
+=cut
+
 sub next {
     my $self = shift;
     my $row = $self->next::method( @_ );
@@ -71,6 +94,9 @@ sub next {
     }
     return $row;
 }
+
+=head2 language_column
+=cut
 
 sub language_column { 'language' }
 
@@ -84,14 +110,6 @@ sub _extract_lang {
 
     return @args;
 }
-
-=head1 NAME
-
-DBIx::Class::ResultSet::I18NColumns - Internationalization for DBIx::Class ResultSet class
-
-=head1 DESCRIPTION
-
-See L<DBIx::Class::I18NColumns>
 
 =head1 AUTHOR
 

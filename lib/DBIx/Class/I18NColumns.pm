@@ -11,6 +11,78 @@ our $VERSION = '0.01';
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language _i18n_column_data / );
 
+=head1 NAME
+
+DBIx::Class::I18NColumns - Internationalization for DBIx::Class Result class
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+=head1 SYNOPSIS
+
+
+    package MySchema::Result::Song;
+
+    use strict;
+    use warnings;
+    use parent 'DBIx::Class';
+
+    __PACKAGE__->load_components( qw/ I18NColumns ForceUTF8 Core / );
+
+    __PACKAGE__->table( 'song' );
+    __PACKAGE__->add_columns(
+        'id',
+        { data_type => 'INT', default_value => 0, is_nullable => 0 },
+        'author',
+        { data_type => 'VARCHAR', default_value => "", is_nullable => 0, size => 255 },
+    );
+    __PACKAGE__->add_i18n_columns(
+        'title',
+        { data_type => 'VARCHAR', default_value => "", is_nullable => 0, size => 255 },
+        'lyrics',
+        { data_type => 'TEXT', default_value => "", is_nullable => 0 },
+    );
+
+    __PACKAGE__->set_primary_key( 'id' );
+    
+    1;
+
+    # then, you have an auto generated resultset where title and lyrics are stored
+    # in different languages:
+
+    my $song = $myschema->resultset( 'Song' )->create({
+        author   => 'Flopa',
+        title    => 'Germinar',
+        lyrics   => 'La vida se toma como el vino pura, y ...',
+        language => 'es',
+    });
+
+    print $song->title; # prints 'Germinar'
+
+    $song->language('en');
+    $song->title('To germinate');      # set title in english
+    $song->lyrics('traslated lyrics'); # set lyrics in english
+    $song->update;                     # store title and lyrics
+
+    print $song->title;         # prints 'To Germinate'
+    print $song->title(['es']); # prints 'Germinar'
+    $song->language('es');
+    print $song->title;         # prints 'Germinar'
+
+=cut
+
+=head2 add_i18n_columns
+    
+    Create internationalizable columns. The columns are created in the same 
+    way you do with in L<add_columns|DBIx::Class::ResultSource/add_columns>.
+
+    Only text and varchar columns can be user. If you don't specify the data_type,
+    varchar will be used by default.
+
+=cut
 sub add_i18n_columns {
     my $self    = shift;
     my @columns = @_;
@@ -41,8 +113,6 @@ sub add_i18n_columns {
     }
 }
 
-sub auto_i18n_rs { 1 }
-
 sub _create_i18n_result_source {
     my $self = shift;
 
@@ -72,8 +142,7 @@ sub _create_i18n_result_source {
         );
 
         $class->set_primary_key( $fk_name, "language", "attr" );
-        $self->schema_class->register_class(
-            $self->_i18n_class_moniker => $class );
+        $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
     }
     else {
         $self->throw_exception(
@@ -82,6 +151,8 @@ sub _create_i18n_result_source {
     }
 }
 
+=head2 schema_class
+=cut
 sub schema_class {
     my $self = shift;
 
@@ -117,8 +188,8 @@ sub _i18n_method {
     return $ret; 
 }
 
-sub foreign_column { 'id_' . shift->result_source->name }
-
+=head2 i18n_resultset
+=cut
 sub i18n_resultset {
     my $self = shift;
 
@@ -132,7 +203,38 @@ sub _i18n_class_moniker {
     my ($i18n_rs_name) = $i18n_rs_class =~ /([^:]+)$/;
 }
 
+=head2 auto_i18n_rs
+
+By default, this component will autocreate the result class that will be 
+used to store internationalized values.
+You should overwrite this method to stop this component to do this and
+then you must create is manually.
+
+In your result class that use this component:
+
+    sub auto_i18n_rs { 0 }
+
+=cut
+
+sub auto_i18n_rs { 1 }
+
+=head2 language_column
+    
+The name for the language column to be used and autocreated.
+Defaults on 'language'.
+
+=cut
+
 sub language_column { 'language' }
+
+=head2 foreign_column
+
+The name for the column to store the PK of the internationalized
+result class.
+Defaults on id_[table name of result source]
+
+=cut
+sub foreign_column { 'id_' . shift->result_source->name }
 
 =head2 has_any_column
 
@@ -159,6 +261,11 @@ sub has_i18n_column {
     return ( exists $self->_i18n_columns->{$column} ) ? 1 : 0;
 }
 
+=head2 set_column
+
+Overloaded L<DBIx::Class::Row/set_column> to manage i18n columns cleanly. 
+
+=cut
 sub set_column {
     my ( $self, $column, $value ) = @_;
 
@@ -170,6 +277,11 @@ sub set_column {
     return $self->next::method( $column, $value );
 }
 
+=head2 store_column
+
+Overloaded L<DBIx::Class::Row/store_column> to manage i18n columns cleanly. 
+
+=cut
 sub store_column {
     my ( $self, $column, $value ) = @_;
 
@@ -196,6 +308,11 @@ sub store_column {
     return $self->next::method( $column, $value );
 }
 
+=head2 get_column
+
+Overloaded L<DBIx::Class::Row/get_column> to manage i18n columns cleanly. 
+
+=cut
 sub get_column {
     my ( $self, $column ) = ( shift, shift );
     my $lang = $self->language;
@@ -220,6 +337,11 @@ sub get_column {
     return $self->next::method( $column, @_ );
 }
 
+=head2 update
+
+Overloaded L<DBIx::Class::Row/update> to manage i18n columns cleanly. 
+
+=cut
 sub update {
     my $self = shift;
 
@@ -240,23 +362,6 @@ sub update {
 #TODO: delete
 #TODO: get_columns
 #TODO: get_dirty_columns
-
-=head1 NAME
-
-DBIx::Class::I18NColumns - Internationalization for DBIx::Class Result class
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-
-
-=head1 SYNOPSIS
-
-
-    use DBIx::Class::I18NColumns;
 
 =head1 AUTHOR
 
