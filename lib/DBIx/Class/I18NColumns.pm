@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 use Scalar::Util qw(blessed);
 use Class::C3::Componentised;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language _i18n_column_data / );
@@ -22,7 +22,6 @@ Version 0.01
 =cut
 
 =head1 SYNOPSIS
-
 
     package MySchema::Result::Song;
 
@@ -74,13 +73,21 @@ Version 0.01
 
 =cut
 
+=head1 DESCRIPTION
+
+This module allows you to define columns that will store multiple values asociated to a language string and use it as normal columns. This is useful when you need to internationalize attributes of your DB entities.
+
+This component will create a new resultset on your schema for each one that use it. Each i18n value will reside in a row of this resultset and will transparently work as any other column as long as you provide a language to your row or resultset methods as you can see at the synopsis.
+
+=head1 METHODS
+
 =head2 add_i18n_columns
     
-    Create internationalizable columns. The columns are created in the same 
-    way you do with in L<add_columns|DBIx::Class::ResultSource/add_columns>.
+Create internationalizable columns. The columns are created in the same 
+way you do with in L<add_columns|DBIx::Class::ResultSource/add_columns>.
 
-    Only text and varchar columns can be user. If you don't specify the data_type,
-    varchar will be used by default.
+Only text and varchar columns can be user. If you don't specify the data_type,
+varchar will be used by default.
 
 =cut
 sub add_i18n_columns {
@@ -363,16 +370,34 @@ sub update {
 #TODO: get_columns
 #TODO: get_dirty_columns
 
+=head1 TODO
+
+=over
+
+=item *
+
+Make it possible to search by i18n_columns
+
+=item *
+
+Do not depend on the PK for the table to be on column 'id'
+
+=item *
+
+Make it possible to use this component on tables with multi-columns PK
+
+=back
+
 =head1 AUTHOR
 
 Diego Kuperman, C<< <diego at freekeylabs.com > >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-dbix-class-i18ncolumns at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-I18NColumns>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+This is an early release, so probable there are plenty of bugs around.
 
+Please report any bugs or feature requests to C<bug-dbix-class-i18ncolumns at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-I18NColumns>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
