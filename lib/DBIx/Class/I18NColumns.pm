@@ -376,6 +376,10 @@ sub update {
 
 =item *
 
+Overload delete, get_columns and get_dirty_columns
+
+=item *
+
 Make it possible to search by i18n_columns
 
 =item *

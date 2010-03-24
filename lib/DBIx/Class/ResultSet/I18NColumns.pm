@@ -4,8 +4,6 @@ use warnings;
 use strict;
 use base qw/ DBIx::Class::ResultSet /; 
 
-__PACKAGE__->mk_group_accessors( 'simple' => qw/ language / );
-
 =head1 NAME
 
 DBIx::Class::ResultSet::I18NColumns - Internationalization for DBIx::Class ResultSet class
@@ -14,7 +12,22 @@ DBIx::Class::ResultSet::I18NColumns - Internationalization for DBIx::Class Resul
 
 See L<DBIx::Class::I18NColumns>
 
+=head1 METHODS
+
+=head2 language
+
+Accessor for language.
+
+=cut
+
+__PACKAGE__->mk_group_accessors( 'simple' => qw/ language / );
+
+=head1 OVERLOADED METHODS
+
 =head2 create
+
+Overloaded L<DBIx::Class::ResultSet/create> to let creation with language and i18n columns.
+
 =cut
 
 sub create {
@@ -48,6 +61,9 @@ sub create {
 }
 
 =head2 find
+
+Overloaded L<DBIx::Class::ResultSet/find> to propagate language to returned L<row|DBIx::Class::Row>.
+
 =cut
 
 sub find {
@@ -60,6 +76,9 @@ sub find {
 }
 
 =head2 search
+
+Overloaded L<DBIx::Class::ResultSet/search> to propagate language to returned L<resultset|DBIx::Class::ResultSet>.
+
 =cut
 
 sub search {
@@ -72,6 +91,9 @@ sub search {
 }
 
 =head2 single
+
+Overloaded L<DBIx::Class::ResultSet/single> to propagate language to returned L<row|DBIx::Class::Row>.
+
 =cut
 
 sub single {
@@ -84,6 +106,9 @@ sub single {
 }
 
 =head2 next
+
+Overloaded L<DBIx::Class::ResultSet/next> to propagate language to returned L<row|DBIx::Class::Row>.
+
 =cut
 
 sub next {
@@ -96,6 +121,9 @@ sub next {
 }
 
 =head2 all
+
+Overloaded L<DBIx::Class::ResultSet/all> to propagate language to L<rows|DBIx::Class::Row> returned on the array.
+
 =cut
 
 sub all {
@@ -108,6 +136,9 @@ sub all {
 }
 
 =head2 language_column
+    
+The name for the pseudo-column that holds the language descriptor.
+
 =cut
 
 sub language_column { 'language' }
@@ -122,6 +153,16 @@ sub _extract_lang {
 
     return @args;
 }
+
+=head1 TODO
+
+=over
+
+=item *
+
+Get language_column name from the ResultSource class.
+
+=back
 
 =head1 AUTHOR
 
