@@ -5,4 +5,7 @@ Revision history for DBIx-Class-I18NColumns
 0.02    03/24/2010
         Overloaded all() to propagate language to rows.
         Better docs and a TODO section.
+0.03    03/24/2010
+        Added parent as a dependency.
+        Better order in docs.
 

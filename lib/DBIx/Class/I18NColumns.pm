@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 use Scalar::Util qw(blessed);
 use Class::C3::Componentised;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language _i18n_column_data / );
@@ -120,94 +120,14 @@ sub add_i18n_columns {
     }
 }
 
-sub _create_i18n_result_source {
-    my $self = shift;
-
-    if ( my $tablename = $self->table ) {
-        my $class = $self->result_class . 'I18N';
-        Class::C3::Componentised->inject_base( $class, 'DBIx::Class' );
-
-        $class->load_components(qw/ ForceUTF8 Core /);
-        $class->table( $tablename . '_i18n' );
-        my $fk_name = 'id_' . $tablename; 
-        $class->add_columns(
-            $fk_name,
-            { data_type => 'INT', default_value => 0, is_nullable => 0 },
-            'language',
-            {
-                data_type     => 'VARCHAR',
-                default_value => '',
-                is_nullable   => 0,
-                size          => 2
-            },
-            'attr',
-            { data_type => 'VARCHAR', is_nullable => 0, size => 32 },
-            'varchar',
-            { data_type => 'VARCHAR', is_nullable => 1, size => 255 },
-            'text',
-            { data_type => 'TEXT', is_nullable => 1 },
-        );
-
-        $class->set_primary_key( $fk_name, "language", "attr" );
-        $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
-    }
-    else {
-        $self->throw_exception(
-            "Cannot create table for i18n strings without a table set on "
-              . $self->result_class );
-    }
-}
-
-=head2 schema_class
-=cut
-sub schema_class {
-    my $self = shift;
-
-    if ( blessed($self) ) {
-        return blessed( $self->result_source->schema );
-    }
-
-    # this is a horrible and fragile hack to find the schema class :(
-    my $schema_class = $self;
-    $schema_class =~ s/::Result.+$//;
-    return $schema_class;
-}
-
-sub _i18n_method {
-    my ( $self, $column ) = ( shift, shift );
-    
-    my $old_language = $self->language;
-    $self->language(pop->[0]) if scalar @_ && ref $_[-1]; 
-
-    $self->throw_exception( "Cannot get or set an i18n column with no language defined" )
-        unless $self->language;
-
-    my $ret;
-    if ( my $value = shift ) {
-        $ret = $self->set_column( $column => $value );
-    }
-    else {
-        $ret = $self->get_column( $column );
-    }
-
-    $self->language($old_language);
-
-    return $ret; 
-}
-
 =head2 i18n_resultset
+
+Retuns an instance of the resultset where i18n strings are stored.
+
 =cut
 sub i18n_resultset {
     my $self = shift;
-
-
     return $self->result_source->schema->resultset( $self->_i18n_class_moniker );
-}
-
-sub _i18n_class_moniker {
-    my $self = shift;
-    my $i18n_rs_class = ( blessed( $self ) || $self ) . 'I18N';
-    my ($i18n_rs_name) = $i18n_rs_class =~ /([^:]+)$/;
 }
 
 =head2 auto_i18n_rs
@@ -267,6 +187,26 @@ sub has_i18n_column {
     my ( $self, $column ) = ( shift, shift );
     return ( exists $self->_i18n_columns->{$column} ) ? 1 : 0;
 }
+
+=head2 schema_class
+
+Returns the name of the schema class.
+
+=cut
+sub schema_class {
+    my $self = shift;
+
+    if ( blessed($self) ) {
+        return blessed( $self->result_source->schema );
+    }
+
+    # this is a horrible and fragile hack to find the schema class :(
+    my $schema_class = $self;
+    $schema_class =~ s/::Result.+$//;
+    return $schema_class;
+}
+
+=head1 OVERLOADED METHODS
 
 =head2 set_column
 
@@ -369,6 +309,72 @@ sub update {
 #TODO: delete
 #TODO: get_columns
 #TODO: get_dirty_columns
+
+sub _create_i18n_result_source {
+    my $self = shift;
+
+    if ( my $tablename = $self->table ) {
+        my $class = $self->result_class . 'I18N';
+        Class::C3::Componentised->inject_base( $class, 'DBIx::Class' );
+
+        $class->load_components(qw/ ForceUTF8 Core /);
+        $class->table( $tablename . '_i18n' );
+        my $fk_name = 'id_' . $tablename; 
+        $class->add_columns(
+            $fk_name,
+            { data_type => 'INT', default_value => 0, is_nullable => 0 },
+            'language',
+            {
+                data_type     => 'VARCHAR',
+                default_value => '',
+                is_nullable   => 0,
+                size          => 2
+            },
+            'attr',
+            { data_type => 'VARCHAR', is_nullable => 0, size => 32 },
+            'varchar',
+            { data_type => 'VARCHAR', is_nullable => 1, size => 255 },
+            'text',
+            { data_type => 'TEXT', is_nullable => 1 },
+        );
+
+        $class->set_primary_key( $fk_name, "language", "attr" );
+        $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
+    }
+    else {
+        $self->throw_exception(
+            "Cannot create table for i18n strings without a table set on "
+              . $self->result_class );
+    }
+}
+
+sub _i18n_method {
+    my ( $self, $column ) = ( shift, shift );
+    
+    my $old_language = $self->language;
+    $self->language(pop->[0]) if scalar @_ && ref $_[-1]; 
+
+    $self->throw_exception( "Cannot get or set an i18n column with no language defined" )
+        unless $self->language;
+
+    my $ret;
+    if ( my $value = shift ) {
+        $ret = $self->set_column( $column => $value );
+    }
+    else {
+        $ret = $self->get_column( $column );
+    }
+
+    $self->language($old_language);
+
+    return $ret; 
+}
+
+sub _i18n_class_moniker {
+    my $self = shift;
+    my $i18n_rs_class = ( blessed( $self ) || $self ) . 'I18N';
+    my ($i18n_rs_name) = $i18n_rs_class =~ /([^:]+)$/;
+}
 
 =head1 TODO
 
