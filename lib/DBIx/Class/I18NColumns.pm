@@ -86,7 +86,7 @@ This component will create a new resultset on your schema for each one that use 
 Create internationalizable columns. The columns are created in the same 
 way you do with in L<add_columns|DBIx::Class::ResultSource/add_columns>.
 
-Only text and varchar columns can be user. If you don't specify the data_type,
+Only text and varchar columns can be used. If you don't specify the data_type,
 varchar will be used by default.
 
 =cut
