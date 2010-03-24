@@ -95,6 +95,18 @@ sub next {
     return $row;
 }
 
+=head2 all
+=cut
+
+sub all {
+    my $self = shift;
+    my @rows = $self->next::method( @_ );
+    if ( $self->language ) {
+        $_->language( $self->language ) for @rows;
+    }
+    return @rows;
+}
+
 =head2 language_column
 =cut
 

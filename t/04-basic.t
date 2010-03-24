@@ -52,6 +52,11 @@ our $item_id;
     is ( $item->language, 'en', 'Row has language set');
 }
 
+{ # all with lang
+    ok ( my @items = $schema->resultset('Item')->search({ language => 'en' })->all, 'All items with language' );
+    is ( $items[0]->language, 'en', 'Items has language set');
+}
+
 { # create item with lang
     ok ( my $item = $schema->resultset('Item')->create({
             name   => 'Carlos Gardel',
