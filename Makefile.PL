@@ -3,6 +3,7 @@ use inc::Module::Install;
 name 'DBIx-Class-I18NColumns';
 all_from 'lib/DBIx/Class/I18NColumns.pm';
 
+requires 'parent';
 requires 'DBIx::Class';
 requires 'DBIx::Class::ForceUTF8';
 requires 'DBICx::TestDatabase';
