@@ -19,7 +19,7 @@ README
 t/00-load.t
 t/02-pod.t
 t/03-pod-coverage.t
-t/04-basic.t
+t/04-manual.t
 t/05-automatic.t
 t/lib/I18NTest.pm
 t/lib/I18NTest/Schema.pm
