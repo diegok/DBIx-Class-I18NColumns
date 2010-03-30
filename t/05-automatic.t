@@ -32,3 +32,8 @@ ok ( my $item_rs = $schema->resultset('Item') );
     is ( $item->string(['es']), 'futbol futbol futbol', 'Spanish string is ok forcing lang');
 }
 
+{
+    ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
+    is ( $item->string, 'test in english', 'English string is set ok');
+    is ( $item->string(['es']), 'futbol futbol futbol', 'Spanish string is ok forcing lang');
+}
