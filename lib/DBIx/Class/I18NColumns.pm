@@ -77,7 +77,7 @@ Version 0.01
 
 This module allows you to define columns that will store multiple values asociated to a language string and use it as normal columns. This is useful when you need to internationalize attributes of your DB entities.
 
-This component will create a new resultset on your schema for each one that use it. Each i18n value will reside in a row of this resultset and will transparently work as any other column as long as you provide a language to your row or resultset methods as you can see at the synopsis.
+This component will create a new resultset on your schema for each one that use it. The auto-created resultset will use the columns definition you give to add_i18n_columns() plus a FK and language columns. The i18n values of each language will reside in a row of this resultset and will transparently work as any other column as long as you provide a language to your row or resultset methods as you can see at the synopsis.
 
 =head1 METHODS
 
@@ -86,8 +86,7 @@ This component will create a new resultset on your schema for each one that use 
 Create internationalizable columns. The columns are created in the same 
 way you do with in L<add_columns|DBIx::Class::ResultSource/add_columns>.
 
-Only text and varchar columns can be used. If you don't specify the data_type,
-varchar will be used by default.
+If you don't specify the data_type, varchar will be used by default.
 
 =cut
 sub add_i18n_columns {
@@ -145,6 +144,10 @@ In your result class that use this component:
 =cut
 
 sub auto_i18n_rs { 1 }
+
+=head2 i18n_rows
+
+A has_many relationship to the i18n resultset will be added to your RS if auto_i18n_rs is allowed.
 
 =head2 language_column
     
