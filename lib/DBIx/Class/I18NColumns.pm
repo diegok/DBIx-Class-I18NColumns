@@ -322,7 +322,7 @@ sub _create_i18n_result_source {
                 data_type     => 'VARCHAR',
                 default_value => '',
                 is_nullable   => 0,
-                size          => 2
+                size          => 5
             },
             %{ $self->_i18n_columns }
         );
