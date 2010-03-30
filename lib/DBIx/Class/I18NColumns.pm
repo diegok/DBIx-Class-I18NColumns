@@ -328,9 +328,12 @@ sub _create_i18n_result_source {
         );
 
         $class->set_primary_key( $fk_name, "language" );
+        $class->belongs_to($fk_name, $self->result_class, { id => $fk_name });
         $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
 
-        #TODO: Add relationships
+        # Add a relationship to the just created RS to this RS.
+        $self->has_many( 'i18n_rows', $class, { 'foreign.' . $fk_name  => 'self.id' } );
+
         #TODO: Add ddl hook for extra params like utf8
     }
     else {

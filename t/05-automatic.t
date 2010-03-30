@@ -36,4 +36,7 @@ ok ( my $item_rs = $schema->resultset('Item') );
     ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
     is ( $item->string, 'test in english', 'English string is set ok');
     is ( $item->string(['es']), 'futbol futbol futbol', 'Spanish string is ok forcing lang');
+
+    ok ( my @i18n_rows = $item->i18n_rows->all, 'Auto-created relation to auto-created RS exists' );
+    is ( scalar(@i18n_rows), 2, 'Relation to i18n rows returned two rows' );
 }
