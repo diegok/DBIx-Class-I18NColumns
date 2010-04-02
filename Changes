@@ -1,16 +1,24 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.05    04/02/2010
+        Propagate sqlt_deploy_hook to the auto-created resultsource.
+        Create a new column on the rs to make dirty when a i18n related
+        row is dirty (and also use this column to cache languages).
+        
 0.04    03/30/2010
         Hard changes to the way 18n related RS works. Now
         the auto-created RS has one column per defined one.
         Docs updated.
         More tests.
+
 0.03    03/24/2010
         Added parent as a dependency.
         Better order in docs.
+
 0.02    03/24/2010
         Overloaded all() to propagate language to rows.
         Better docs and a TODO section.
+
 0.01    03/23/2010
         First version, released on an unsuspecting world.
 

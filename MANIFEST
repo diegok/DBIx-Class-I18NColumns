@@ -27,5 +27,3 @@ t/lib/I18NTest/Schema/Result/Item.pm
 t/lib/I18NTest/Schema/Result/ItemI18N.pm
 t/lib/I18NTest/SchemaAuto.pm
 t/lib/I18NTest/SchemaAuto/Result/Item.pm
-t/pod-coverage.t
-t/pod.t
