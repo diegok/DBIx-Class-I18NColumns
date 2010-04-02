@@ -23,4 +23,9 @@ __PACKAGE__->add_i18n_columns(
 
 __PACKAGE__->set_primary_key( 'id' );
 
+sub sqlt_deploy_hook {
+    my ($self, $sqlt_table) = @_;
+    $sqlt_table->extra( mysql_charset => 'utf8' );
+}
+
 1;

@@ -118,6 +118,7 @@ sub add_i18n_columns {
     }
 
     $self->_create_i18n_result_source if $self->auto_i18n_rs;
+    $self->_add_languages_column;
 }
 
 =head2 i18n_resultset
@@ -148,6 +149,17 @@ sub auto_i18n_rs { 1 }
 =head2 i18n_rows
 
 A has_many relationship to the i18n resultset will be added to your RS if auto_i18n_rs is allowed.
+
+=head2 languages
+
+Returns an array of available languages. 
+
+=cut
+sub languages {
+    my $self = shift;
+    my @langs = $self->_languages ? split( /\s+/, $self->_languages ): ();
+    return wantarray ? @langs : [ @langs ];
+}
 
 =head2 language_column
     
@@ -221,7 +233,6 @@ sub set_column {
     my ( $self, $column, $value ) = @_;
 
     if ( $self->has_i18n_column($column) ) {
-        #TODO: do I need to make it dirty?
         return $self->store_column( $column => $value );
     }
 
@@ -240,6 +251,9 @@ sub store_column {
     $self->_i18n_column_row( {} ) unless $self->_i18n_column_row;
 
     if ( $self->has_i18n_column($column) ) {
+
+        $self->_make_languages_dirty($lang);
+
         if ( my $i18n_row = $self->_i18n_column_row->{$lang} ) {
             return $i18n_row->$column($value);
         }
@@ -305,7 +319,6 @@ sub update {
 
 #TODO: delete
 #TODO: get_columns
-#TODO: get_dirty_columns
 
 sub _create_i18n_result_source {
     my $self = shift;
@@ -332,17 +345,48 @@ sub _create_i18n_result_source {
 
         $class->set_primary_key( $fk_name, "language" );
         $class->belongs_to($fk_name, $self->result_class, { id => $fk_name });
+
+        # Transfer sqlt_deploy_hook if exists
+        if ( $self->can('sqlt_deploy_hook') ) {
+            no strict 'refs';
+            *{ $class . '::' . 'sqlt_deploy_hook' } = *{ $self->result_class . '::sqlt_deploy_hook' };
+        }
+
         $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
 
         # Add a relationship to the just created RS to this RS.
         $self->has_many( 'i18n_rows', $class, { 'foreign.' . $fk_name  => 'self.id' } );
-
-        #TODO: Add ddl hook for extra params like utf8
     }
     else {
         $self->throw_exception(
             "Cannot create table for i18n strings without a table set on "
               . $self->result_class );
+    }
+}
+
+# make sure origin table has 'languages' column
+# This columns is a hack to make possible to mark row dirty 
+# when some i18n row is dirty so components deppending on 
+# that will still work (TimeStamp for example).
+sub _add_languages_column {
+    my $self = shift;
+
+    $self->add_columns(
+        languages => { data_type => 'VARCHAR', size => 128, is_nullable => 1, accessor => '_languages' }
+    ) unless $self->has_column('languages');
+}
+
+sub _make_languages_dirty {
+    my ( $self, $lang ) = @_;
+
+    my %langs = map { $_ => 1 } $self->languages;
+
+    if ( exists $langs{$lang} ) {
+        $self->make_column_dirty( 'languages' );
+    }
+    else {
+        $langs{$lang}++;
+        $self->_languages( join ' ', keys %langs );
     }
 }
 

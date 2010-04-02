@@ -9,7 +9,7 @@ BEGIN { use_ok 'I18NTest' }
 ok ( my $schema = I18NTest->new('I18NTest::SchemaAuto'), 'Create a schema object' );
 isa_ok ( $schema, 'I18NTest::SchemaAuto');
 
-ok ( my $item_rs = $schema->resultset('Item') );
+ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
 
 { 
     ok ( my $item = $item_rs->create({
@@ -45,7 +45,11 @@ ok ( my $item_rs = $schema->resultset('Item') );
     ok ( $item->text( "ain't problem here neither you!" ), "Set text in american english" );
     ok ( $item->update, "Call update" );
 
+    is_deeply ( [ sort $item->languages ], [ qw( en en_us es ) ], "Languages reported for the row are fine" );
+
     ok ( my $i18n_row = $item->i18n_rows({ language => 'en_us' })->single, 'Retrieve american english i18n row' );
     is ( $i18n_row->string, "ain't problem here!", 'Row string is ok!' );
+
+    ok ( $i18n_row->can('sqlt_deploy_hook'), 'i18n rs has sqlt_deploy_hook copied!' );
 }
 
