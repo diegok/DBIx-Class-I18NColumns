@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 use Scalar::Util qw(blessed);
 use Class::C3::Componentised;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ language _i18n_column_row / );
@@ -422,7 +422,8 @@ sub _i18n_method {
         unless $self->language;
 
     my $ret;
-    if ( my $value = shift ) {
+    if ( @_ ) {
+        my $value = shift;
         $ret = $self->set_column( $column => $value );
     }
     else {

@@ -53,3 +53,18 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
     ok ( $i18n_row->can('sqlt_deploy_hook'), 'i18n rs has sqlt_deploy_hook copied!' );
 }
 
+{
+    ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
+    is ( $item->string(''), '', 'Set a empty string');
+    is ( $item->text(undef), undef, 'Set a undef text');
+    is ( $item->string, '', 'String is empty');
+    is ( $item->text, undef, 'Text is undef');
+    ok ( $item->update, "Call update" );
+
+    $item = undef;
+
+    ok ( $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
+    is ( $item->string, '', 'String is empty');
+    is ( $item->text, undef, 'Text is undef');
+}
+

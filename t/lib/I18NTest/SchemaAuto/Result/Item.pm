@@ -16,9 +16,9 @@ __PACKAGE__->add_columns(
 );
 __PACKAGE__->add_i18n_columns(
     'string',
-    { data_type => 'VARCHAR', default_value => "", is_nullable => 0, size => 255 },
+    { data_type => 'VARCHAR', default_value => "", is_nullable => 1, size => 255 },
     'text',
-    { data_type => 'TEXT', default_value => "", is_nullable => 0 },
+    { data_type => 'TEXT', default_value => "", is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key( 'id' );
