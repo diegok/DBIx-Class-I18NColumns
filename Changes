@@ -1,5 +1,10 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.06    04/05/2010
+        Overloaded insert() to manage language
+        Overloaded ResultSet::new_result to be able to set i18n columns 
+        on rs->new({})
+        
 0.05    04/02/2010
         Propagate sqlt_deploy_hook to the auto-created resultsource.
         Create a new column on the rs to make dirty when a i18n related
