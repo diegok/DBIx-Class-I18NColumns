@@ -317,6 +317,28 @@ sub update {
     return $self;
 }
 
+=head2 insert
+
+Overloaded L<DBIx::Class::Row/insert> to manage i18n columns cleanly. 
+
+=cut
+sub insert {
+    my $self = shift;
+
+    $self->next::method( @_ );
+
+    if ( $self->_i18n_column_row ) {
+        for my $lang ( keys %{$self->_i18n_column_row} ) {
+            my $i18n_row = $self->_i18n_column_row->{$lang};
+            my $fk = $self->foreign_column;
+            $i18n_row->$fk( $self->id );
+            $i18n_row->insert;
+        }
+    }
+
+    return $self;
+}
+
 #TODO: delete
 #TODO: get_columns
 
