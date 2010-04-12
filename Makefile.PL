@@ -5,9 +5,9 @@ all_from 'lib/DBIx/Class/I18NColumns.pm';
 
 requires 'parent';
 requires 'DBIx::Class';
-requires 'DBICx::TestDatabase' => '0.03';
 
 test_requires 'Test::More' => '0.88';
+test_requires 'DBD::SQLite' => '1.29';
 
 auto_install;
 WriteAll;

@@ -3,6 +3,7 @@ abstract: 'Internationalization for DBIx::Class Result class'
 author:
   - 'Diego Kuperman, C<< <diego at freekeylabs.com > >>'
 build_requires:
+  DBD::SQLite: 1.29
   ExtUtils::MakeMaker: 6.42
   Test::More: 0.88
 configure_requires:
@@ -19,7 +20,6 @@ no_index:
     - inc
     - t
 requires:
-  DBICx::TestDatabase: 0.03
   DBIx::Class: 0
   parent: 0
 resources:
