@@ -347,9 +347,8 @@ sub _create_i18n_result_source {
 
     if ( my $tablename = $self->table ) {
         my $class = $self->result_class . 'I18N';
-        Class::C3::Componentised->inject_base( $class, 'DBIx::Class' );
+        Class::C3::Componentised->inject_base( $class, 'DBIx::Class::Core' );
 
-        $class->load_components(qw/ Core /);
         $class->table( $tablename . '_i18n' );
         my $fk_name = 'id_' . $tablename; 
         $class->add_columns(
