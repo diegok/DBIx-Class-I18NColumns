@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'DBIx::Class';
 
-__PACKAGE__->load_components( qw/ I18NColumns ForceUTF8 Core / );
+__PACKAGE__->load_components( qw/ I18NColumns Core / );
 
 __PACKAGE__->table( 'item' );
 __PACKAGE__->add_columns(

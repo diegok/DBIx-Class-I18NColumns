@@ -19,10 +19,9 @@ no_index:
     - inc
     - t
 requires:
-  DBICx::TestDatabase: 0
+  DBICx::TestDatabase: 0.03
   DBIx::Class: 0
-  DBIx::Class::ForceUTF8: 0
   parent: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: 0.07
+version: 0.08

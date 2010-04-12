@@ -1,12 +1,15 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.08    04/12/2010
+        Getting out ForceUTF8(deprecated) dependency.
+
 0.07    04/05/2010
-        Let i18n fields be undef or empty string on set
+        Let i18n fields be undef or empty string on set.
 
 0.06    04/05/2010
-        Overloaded insert() to manage language
+        Overloaded insert() to manage language.
         Overloaded ResultSet::new_result to be able to set i18n columns 
-        on rs->new({})
+        on rs->new({}).
         
 0.05    04/02/2010
         Propagate sqlt_deploy_hook to the auto-created resultsource.

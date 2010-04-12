@@ -5,8 +5,7 @@ all_from 'lib/DBIx/Class/I18NColumns.pm';
 
 requires 'parent';
 requires 'DBIx::Class';
-requires 'DBIx::Class::ForceUTF8';
-requires 'DBICx::TestDatabase';
+requires 'DBICx::TestDatabase' => '0.03';
 
 test_requires 'Test::More' => '0.88';
 
