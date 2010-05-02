@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.09    04/13/2010
+        Using DBIx::Class::Core as base instead of load module.
+        Added sqlt as ia test dependency.
+
 0.08    04/12/2010
         Getting out ForceUTF8(deprecated) dependency.
 
