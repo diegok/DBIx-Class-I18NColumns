@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.10    05/03/2010
+        Docs for row attribute language(). 
+
 0.09    04/13/2010
         Using DBIx::Class::Core as base instead of load module.
         Added sqlt as ia test dependency.
