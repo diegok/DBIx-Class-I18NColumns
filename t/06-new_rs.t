@@ -36,6 +36,8 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
     ok ( $item->insert, "Insert created row" );
 
     ok ( my $item_id = $item->id, 'Item has ID' );
+    is ( $item->language, 'en', 'Item has language defined' );
+    is ( $item->string, 'The great hand of god', 'string is ok' );
 
     $item = undef;
     ok ( $item = $item_rs->find( $item_id ), 'Retrieve the created item by ID');

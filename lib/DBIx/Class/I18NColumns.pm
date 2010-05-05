@@ -343,6 +343,23 @@ sub insert {
     return $self;
 }
 
+=head2 get_from_storage
+
+Overloaded L<DBIx::Class::Row/get_from_storage> to manage i18n columns cleanly. 
+
+=cut
+sub get_from_storage {
+    my $self = shift;
+    my $language = $self->language;
+
+    my $new_object = $self->next::method( @_ );
+
+    if ( $language && $new_object ) {
+        $new_object->language($language);
+    }
+    return $new_object;
+}
+
 #TODO: delete
 #TODO: get_columns
 

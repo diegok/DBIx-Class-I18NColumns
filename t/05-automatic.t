@@ -47,6 +47,9 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
 
     is_deeply ( [ sort $item->languages ], [ qw( en en_us es ) ], "Languages reported for the row are fine" );
 
+    ok ( $item->discard_changes, 'Call discard_changes()');
+    is ( $item->language, 'en_us', 'Fresh object has language' );
+
     ok ( my $i18n_row = $item->i18n_rows({ language => 'en_us' })->single, 'Retrieve american english i18n row' );
     is ( $i18n_row->string, "ain't problem here!", 'Row string is ok!' );
 
