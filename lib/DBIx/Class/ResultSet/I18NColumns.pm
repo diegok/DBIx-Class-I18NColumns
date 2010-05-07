@@ -103,9 +103,39 @@ Overloaded L<DBIx::Class::ResultSet/find> to propagate language to returned L<ro
 
 sub find {
     my $self = shift;
-    my $row = $self->next::method( $self->_extract_lang(@_) );
+
+    my @args = $self->_extract_lang(@_);
+
+    # extract i18n columns
+    my $i18n_attr = {};
+    if ( ref $args[0] eq 'HASH' ) {
+        my %attr = %{$args[0]};
+        for my $attr ( keys %attr ) {
+            if ( $self->result_class->has_i18n_column($attr) ) {
+                $i18n_attr->{$attr} = delete $attr{$attr};
+            }
+        }
+        $args[0] = \%attr;
+    }
+
+    my $row = $self->next::method( @args );
+
+    my $lang = $self->language;
     if ( $row && $self->language ) {
         $row->language( $self->language );
+    }
+
+    # do I have to filter by i18n columns?
+    if ( $row && $i18n_attr ) {
+        my $lang = $self->language || $self->result_source->schema->_language_last_set;
+        return undef unless ( $lang && $row->has_language($lang) );
+        $row->language($lang);
+
+        for my $attr ( keys %{$i18n_attr} ) {
+            my $stored_value = $row->$attr || '';
+            return undef 
+                unless ( $stored_value eq $i18n_attr->{$attr} ); 
+        }
     }
     return $row;
 }
@@ -184,6 +214,7 @@ sub _extract_lang {
 
     if ( ( ref $args[0] eq 'HASH' ) && ( my $lang = delete $args[0]->{ $self->language_column } ) ) {
         $self->language($lang);
+        $self->result_source->schema->_language_last_set($lang);
     }
 
     return @args;

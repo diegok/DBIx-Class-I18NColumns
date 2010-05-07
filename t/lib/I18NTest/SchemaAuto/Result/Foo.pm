@@ -1,5 +1,5 @@
 package 
-    I18NTest::SchemaAuto::Result::Item;
+    I18NTest::SchemaAuto::Result::Foo;
 
 use strict;
 use warnings;
@@ -7,12 +7,12 @@ use parent 'DBIx::Class';
 
 __PACKAGE__->load_components( qw/ I18NColumns Core / );
 
-__PACKAGE__->table( 'totem' );
+__PACKAGE__->table( 'foo' );
 __PACKAGE__->add_columns(
     'id',
     { data_type => 'INT', default_value => 0, is_nullable => 0, is_auto_increment => 1 },
-    'name',
-    { data_type => 'VARCHAR', default_value => "", is_nullable => 0, size => 255 },
+    'id_item',
+    { data_type => 'INT', default_value => 0, is_nullable => 0 },
 );
 __PACKAGE__->add_i18n_columns(
     'string',
@@ -23,10 +23,7 @@ __PACKAGE__->add_i18n_columns(
 
 __PACKAGE__->set_primary_key( 'id' );
 
-__PACKAGE__->has_many( 'foos', 'I18NTest::SchemaAuto::Result::Foo', { 'foreign.id_item' => 'self.id' } );
-
-__PACKAGE__->has_many( 'item_bars', 'I18NTest::SchemaAuto::Result::ItemBar', { 'foreign.id_item' => 'self.id' } );
-__PACKAGE__->many_to_many( 'bars', 'item_bars', 'bar' );
+__PACKAGE__->belongs_to( 'item', 'I18NTest::SchemaAuto::Result::Item', { 'foreign.id' => 'self.id_item' }, );
 
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;

@@ -1,5 +1,5 @@
 package 
-    I18NTest::SchemaAuto::Result::Item;
+    I18NTest::SchemaAuto::Result::Bar;
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use parent 'DBIx::Class';
 
 __PACKAGE__->load_components( qw/ I18NColumns Core / );
 
-__PACKAGE__->table( 'totem' );
+__PACKAGE__->table( 'bar' );
 __PACKAGE__->add_columns(
     'id',
     { data_type => 'INT', default_value => 0, is_nullable => 0, is_auto_increment => 1 },
@@ -23,10 +23,9 @@ __PACKAGE__->add_i18n_columns(
 
 __PACKAGE__->set_primary_key( 'id' );
 
-__PACKAGE__->has_many( 'foos', 'I18NTest::SchemaAuto::Result::Foo', { 'foreign.id_item' => 'self.id' } );
+__PACKAGE__->has_many( 'bar_items', 'I18NTest::SchemaAuto::Result::ItemBar', { 'foreign.id_bar' => 'self.id' } );
+__PACKAGE__->many_to_many( 'items', 'bar_items', 'item' );
 
-__PACKAGE__->has_many( 'item_bars', 'I18NTest::SchemaAuto::Result::ItemBar', { 'foreign.id_item' => 'self.id' } );
-__PACKAGE__->many_to_many( 'bars', 'item_bars', 'bar' );
 
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;
