@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.12    05/08/2010
+        Fixed bug prevented find() to work on some cases.
+
 0.11    05/07/2010
         Propagate language to relationships with
         RS that also use I18NColumns.

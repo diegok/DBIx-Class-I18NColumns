@@ -86,3 +86,8 @@ ok ( my $foo_rs = $schema->resultset('Foo'), 'Get Foo resultset' );
         is ( $bar->language, 'es', "Related item($count) has language propagated" );
     }
 }
+
+{
+    ok ( my $item = $item_rs->find(1), 'Retrieve the item with find()' );
+    is ( $item->id, 1, 'Item is ok' );
+}

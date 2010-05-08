@@ -33,7 +33,7 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
 }
 
 {
-    ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
+    ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved with language' );
     is ( $item->string, 'test in english', 'English string is set ok');
     is ( $item->string(['es']), 'futbol futbol futbol', 'Spanish string is ok forcing lang');
 
@@ -57,7 +57,8 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
 }
 
 {
-    ok ( my $item = $item_rs->search({ language => 'en' })->single, 'Single item retrieved' );
+    ok ( my $item = $item_rs->find(1), 'Item retrieved with find()' );
+    ok ( $item->language( 'en' ), 'Set language on finded item' );
     is ( $item->string(''), '', 'Set a empty string');
     is ( $item->text(undef), undef, 'Set a undef text');
     is ( $item->string, '', 'String is empty');

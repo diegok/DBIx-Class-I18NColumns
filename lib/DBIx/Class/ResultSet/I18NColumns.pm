@@ -126,7 +126,7 @@ sub find {
     }
 
     # do I have to filter by i18n columns?
-    if ( $row && $i18n_attr ) {
+    if ( $row && %$i18n_attr ) {
         my $lang = $self->language || $self->result_source->schema->_language_last_set;
         return undef unless ( $lang && $row->has_language($lang) );
         $row->language($lang);
