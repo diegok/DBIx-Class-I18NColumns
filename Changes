@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.13    05/08/2010
+        I'm retarded and forgot to add new files to MANIFEST, just that :(
+
 0.12    05/08/2010
         Fixed bug prevented find() to work on some cases.
 
