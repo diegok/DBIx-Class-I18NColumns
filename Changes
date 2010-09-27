@@ -1,5 +1,11 @@
 Revision history for DBIx-Class-I18NColumns
 
+0.14    09/27/2010
+        Added overwritable method auto_resultset_class() to let users write
+        their own resultset classes.
+        Author tests moved to xt/.
+        Better docs.
+
 0.13    05/08/2010
         I'm retarded and forgot to add new files to MANIFEST, just that :(
 
