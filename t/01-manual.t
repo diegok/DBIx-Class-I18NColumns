@@ -74,3 +74,8 @@ our $item_id;
     ok ( my $rs = $schema->resultset('ItemI18N')->search(), 'Search i18n rs' );
     is ( $rs->next->testme, 'yay!', 'Row object has extended method');
 }
+
+{
+    ok ($schema->resultset('Item')->can('dance'), 'Resultset class has extedend method');
+}
+

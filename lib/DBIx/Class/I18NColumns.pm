@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 use Scalar::Util qw(blessed);
 use Class::C3::Componentised;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ _language _i18n_column_row / );
@@ -96,7 +96,9 @@ sub add_i18n_columns {
     my @columns = @_;
 
     $self->_i18n_columns( {} ) unless defined $self->_i18n_columns();
-    $self->resultset_class( 'DBIx::Class::ResultSet::I18NColumns' );
+
+    $self->resultset_class( 'DBIx::Class::ResultSet::I18NColumns' )
+        if $self->auto_resultset_class;
 
     # Add columns & accessors
     while ( my $column = shift @columns ) {
@@ -151,12 +153,37 @@ sub i18n_resultset {
     return $self->result_source->schema->resultset( $self->_i18n_class_moniker );
 }
 
+=head2 auto_resultset_class
+
+By default, this component will set the resultset class to L<DBIx::Class::ResultSet::I18NColumns>.
+If you need to write your own resultset methods, you'll need to overwrite this method to return
+false and then, you write your resultset class as usual but based on L<DBIx::Class::ResultSet::I18NColumns>
+instead of L<DBIx::Class::ResultSet>.
+
+In your result class that use this component:
+
+    sub auto_resultset_class { 0 }
+
+Then, in your resultset class you should do something like:
+
+    package MySchema::ResultSet::Item;
+    use base 'DBIx::Class::ResultSet::I18NColumns';
+
+    # ... your rs methods ...
+
+    1;
+
+as described on the L<manual|DBIx::Class::Manual::Cookbook/Predefined_searches>.
+=cut
+
+sub auto_resultset_class { 1 }
+
 =head2 auto_i18n_rs
 
 By default, this component will autocreate the result class that will be 
 used to store internationalized values.
-You should overwrite this method to stop this component to do this and
-then you must create is manually.
+You can overwrite this method to stop this component doing this and
+then you must create it manually.
 
 In your result class that use this component:
 
