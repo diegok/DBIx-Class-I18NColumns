@@ -30,7 +30,8 @@ __PACKAGE__->many_to_many( 'bars', 'item_bars', 'bar' );
 
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;
-    $sqlt_table->extra( mysql_charset => 'utf8' );
+
+    $sqlt_table->add_index( name => 'idx_name', fields => [qw/ name /] );                                             
 }
 
 1;

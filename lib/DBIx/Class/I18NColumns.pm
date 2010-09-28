@@ -6,7 +6,7 @@ use base qw/DBIx::Class/;
 use Scalar::Util qw(blessed);
 use Class::C3::Componentised;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 __PACKAGE__->mk_classdata('_i18n_columns');
 __PACKAGE__->mk_group_accessors( 'simple' => qw/ _language _i18n_column_row / );
@@ -17,7 +17,7 @@ DBIx::Class::I18NColumns - Internationalization for DBIx::Class Result class
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =cut
 
@@ -455,12 +455,6 @@ sub _create_i18n_result_source {
 
         $class->set_primary_key( $fk_name, "language" );
         $class->belongs_to($fk_name, $self->result_class, { id => $fk_name });
-
-        # Transfer sqlt_deploy_hook if exists
-        if ( $self->can('sqlt_deploy_hook') ) {
-            no strict 'refs';
-            *{ $class . '::' . 'sqlt_deploy_hook' } = *{ $self->result_class . '::sqlt_deploy_hook' };
-        }
 
         $self->schema_class->register_class( $self->_i18n_class_moniker => $class );
 

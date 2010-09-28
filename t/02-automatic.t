@@ -52,8 +52,6 @@ ok ( my $item_rs = $schema->resultset('Item'), 'Get Item resultset' );
 
     ok ( my $i18n_row = $item->i18n_rows({ language => 'en_us' })->single, 'Retrieve american english i18n row' );
     is ( $i18n_row->string, "ain't problem here!", 'Row string is ok!' );
-
-    ok ( $i18n_row->can('sqlt_deploy_hook'), 'i18n rs has sqlt_deploy_hook copied!' );
 }
 
 {

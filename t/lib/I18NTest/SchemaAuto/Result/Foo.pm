@@ -25,9 +25,4 @@ __PACKAGE__->set_primary_key( 'id' );
 
 __PACKAGE__->belongs_to( 'item', 'I18NTest::SchemaAuto::Result::Item', { 'foreign.id' => 'self.id_item' }, );
 
-sub sqlt_deploy_hook {
-    my ($self, $sqlt_table) = @_;
-    $sqlt_table->extra( mysql_charset => 'utf8' );
-}
-
 1;

@@ -26,10 +26,4 @@ __PACKAGE__->set_primary_key( 'id' );
 __PACKAGE__->has_many( 'bar_items', 'I18NTest::SchemaAuto::Result::ItemBar', { 'foreign.id_bar' => 'self.id' } );
 __PACKAGE__->many_to_many( 'items', 'bar_items', 'item' );
 
-
-sub sqlt_deploy_hook {
-    my ($self, $sqlt_table) = @_;
-    $sqlt_table->extra( mysql_charset => 'utf8' );
-}
-
 1;
