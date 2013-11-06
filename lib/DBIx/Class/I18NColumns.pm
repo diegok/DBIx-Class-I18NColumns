@@ -23,7 +23,7 @@ Version 0.15
 
 =head1 SYNOPSIS
 
-	package My::Schema::Result::Song; 
+    package My::Schema::Result::Song; 
     
     use strict;
     use warnings;
