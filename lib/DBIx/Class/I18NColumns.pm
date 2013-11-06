@@ -23,8 +23,8 @@ Version 0.15
 
 =head1 SYNOPSIS
 
-    package MySchema::Result::Song;
-
+	package My::Schema::Result::Song; 
+    
     use strict;
     use warnings;
     use parent 'DBIx::Class';
@@ -49,10 +49,37 @@ Version 0.15
     
     1;
 
+	# Load namespaces
+	
+	use utf8;
+	package My::Schema;
+
+	use strict;
+	use warnings;
+
+	use base 'DBIx::Class::Schema';
+
+	__PACKAGE__->load_namespaces;
+	
+	1;
+
+
     # then, you have an auto generated resultset where title and lyrics are stored
     # in different languages:
+	
+	use strict;
+	use warnings;
 
-    my $song = $myschema->resultset( 'Song' )->create({
+	use My::Schema;
+
+	my $dbfile = "musicbox.db";
+ 
+	die "please remove previously created db file: $dbfile" if -e $dbfile;
+ 
+	my $schema = My::Schema->connect("dbi:SQLite:$dbfile"); 
+	$schema->deploy; 
+
+    my $song = $schema->resultset( 'Song' )->create({
         author   => 'Flopa',
         title    => 'Germinar',
         lyrics   => 'La vida se toma como el vino pura, y ...',
